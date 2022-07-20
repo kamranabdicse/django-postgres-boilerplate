@@ -1,5 +1,5 @@
-# copy-trading
-The MVP of our cryptocurrency copy trading platform.
+# Order Book
+The MVP of our Order book in library platform.
 
 To run this app for local development you have to provide right values for environment variables specified in '.env'
 and install required python packages specified in 'requirements.txt'. You can find both files in root directory of project.
