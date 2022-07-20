@@ -1,0 +1,9 @@
+/.mypy_cache/
+/.pydevproject
+.idea/
+!/**/__init__.py
+/**/__pycache__/
+*.pyc
+picture/*
+media/*
+dump.rdb
