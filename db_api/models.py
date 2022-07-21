@@ -19,22 +19,42 @@ class UserORM(AbstractUser):
     def _generate_jwt_token(self):
         token_lifetime = datetime.datetime.now() + datetime.timedelta(hours=1)
 
-        token = jwt.encode({
-            'jti': uuid.uuid4().hex[:15].lower(),
-            'user_id': self.pk,
-            'username': self.username,
-            'exp': int(token_lifetime.strftime('%s'))
-        }, settings.JWT.get('SIGNING_KEY'), algorithm='HS256')
+        token = jwt.encode(
+            {
+                "jti": uuid.uuid4().hex[:15].lower(),
+                "user_id": self.pk,
+                "username": self.username,
+                "exp": int(token_lifetime.strftime("%s")),
+            },
+            settings.JWT.get("SIGNING_KEY"),
+            algorithm="HS256",
+        )
 
         return token
+
 
 class BookORM(SafeTemplate):
     title = models.CharField(max_length=150)
     author_name = models.CharField(max_length=50)
+    price = models.PositiveIntegerField(default=0)
+
 
 class OrderORM(SafeTemplate):
     book = models.ManyToManyField(BookORM, related_name="order_book")
     user = models.ForeignKey(UserORM, on_delete=models.CASCADE)
+    total_price = models.PositiveIntegerField(default=0)
+    status_choices = models.TextChoices(
+        "status",
+        "choose purchased",
+    )
+    status = models.CharField(
+        max_length=20,
+        choices=status_choices.choices,
+        default=status_choices.choose.value,
+    )
+    choose_time = models.DateTimeField(null=True)
+    purchased_time = models.DateTimeField(null=True)
+
 
 
 class BlacklistedToken(models.Model):
