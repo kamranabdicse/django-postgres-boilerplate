@@ -1,14 +1,21 @@
-import jwt
 import base64
+import logging
+
+import jwt
+
 from django.conf import settings
 from django.contrib.auth import authenticate
 from rest_framework import authentication, exceptions
+
 from db_api.models import UserORM, BlacklistedToken
 
 
+logger = logging.getLogger(__name__)
+
+
 class CustomAuthentication(authentication.BaseAuthentication):
-    msg = 'Invalid authentication'
-    authentication_header_prefix = ('Bearer', 'Basic')
+    msg = "Invalid authentication"
+    authentication_header_prefix = ("Bearer", "Basic")
 
     def authenticate(self, request):
         """
@@ -41,8 +48,8 @@ class CustomAuthentication(authentication.BaseAuthentication):
         if len(auth_header) != 2:
             raise exceptions.AuthenticationFailed(self.msg)
 
-        prefix = auth_header[0].decode('utf-8')
-        token = auth_header[1].decode('utf-8')
+        prefix = auth_header[0].decode("utf-8")
+        token = auth_header[1].decode("utf-8")
 
         if prefix not in self.authentication_header_prefix:
             raise exceptions.AuthenticationFailed(self.msg)
@@ -60,8 +67,8 @@ class CustomAuthentication(authentication.BaseAuthentication):
                 decoded_token = jwt_decoder(token)
             else:
                 decoded_token = basic_token_decoder(token)
-                username = decoded_token.split(':')[0].strip()
-                password = decoded_token.split(':')[1].strip()
+                username = decoded_token.split(":")[0].strip()
+                password = decoded_token.split(":")[1].strip()
                 user = authenticate(username=username, password=password)
                 if user is None:
                     raise Exception
@@ -76,7 +83,8 @@ class CustomAuthentication(authentication.BaseAuthentication):
                 user = UserORM.objects.get(pk=decoded_token["user_id"])
             else:
                 user = UserORM.objects.get(
-                    username=decoded_token.split(':')[0].strip(), can_use_basic_token=True
+                    username=decoded_token.split(":")[0].strip(),
+                    can_use_basic_token=True,
                 )
         except UserORM.DoesNotExist:
             raise exceptions.AuthenticationFailed(self.msg)
@@ -87,10 +95,8 @@ class CustomAuthentication(authentication.BaseAuthentication):
         return (user, token)
 
 
-
-
 def jwt_decoder(token):
-    decoded_jwt = jwt.decode(token, settings.JWT_SECRET_KEY, algorithms='HS256')
+    decoded_jwt = jwt.decode(token, settings.JWT_SECRET_KEY, algorithms="HS256")
     return decoded_jwt
 
 

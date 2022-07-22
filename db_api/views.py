@@ -1,25 +1,21 @@
-from rest_framework.decorators import permission_classes, api_view, schema, action
-import datetime, random
-from django.http import JsonResponse, Http404
-from django.db.models import Q
-from django.db.utils import IntegrityError
+import logging
+import random
 
+from django.http import JsonResponse, Http404
 from rest_framework.schemas.openapi import AutoSchema
-from rest_framework import generics, serializers, status, viewsets, mixins
-from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework import generics
+from rest_framework.permissions import AllowAny
+from rest_framework.decorators import api_view, schema
 
 from project_name.lib.sms import SMS
 from project_name.lib.openapi import CustomSchema
 from project_name.lib.logger import logger
+from db_api.serializers import GenerateOTPSerializer, LoginSerializer
+from db_api.models import UserORM
 
-from db_api.serializers import (
-    GenerateOTPSerializer,
-    LoginSerializer
-)
 
-from db_api.models import (
-    UserORM
-)
+logger = logging.getLogger(__name__)
+
 
 @api_view(["POST"])
 @schema(
@@ -42,7 +38,7 @@ def generate_otp(request):
     mobile = serializer.validated_data.get("mobile")
     user = UserORM.objects.filter(username=mobile).first()
     created = False
-    
+
     if not user:
         user = UserORM.objects.create(username=mobile)
         print("----------> create user")
@@ -50,7 +46,7 @@ def generate_otp(request):
 
     # rnd = random.SystemRandom()
     # otp = rnd.randrange(100000, 999999)
-    otp= 123
+    otp = 123
     user.set_password(str(otp))
     user.save()
 
@@ -68,6 +64,7 @@ class LoginView(generics.GenericAPIView):
     """
     Media Crud
     """
+
     schema = AutoSchema(tags=["user"], operation_id_base="login")
     permission_classes = (AllowAny,)
     serializer_class = LoginSerializer
