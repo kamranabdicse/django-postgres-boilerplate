@@ -1,9 +1,15 @@
-from rest_framework.views import exception_handler
-from rest_framework import exceptions, status
+import traceback
+import logging
+
+import orjson
+
 from django.utils.translation import gettext as _
 from django.http import JsonResponse
-import orjson
-import traceback
+from rest_framework.views import exception_handler
+from rest_framework import exceptions, status
+
+
+logger = logging.getLogger(__name__)
 
 
 def get_response(message="", details="", status=False, status_code=200, trace=""):
@@ -32,23 +38,27 @@ def get_error_details(error_data, error_details=""):
 def handle_exception(exc, context):
     error_response = exception_handler(exc, context)
     if error_response is not None:
-        if isinstance(exc, (exceptions.AuthenticationFailed, exceptions.NotAuthenticated)):
+        if isinstance(
+            exc, (exceptions.AuthenticationFailed, exceptions.NotAuthenticated)
+        ):
             error_response.status_code = status.HTTP_401_UNAUTHORIZED
         error = error_response.data
         error_response.data = get_response(
             message=exc.__class__.__name__,
             details=get_error_details(error),
             status_code=error_response.status_code,
-            trace=orjson.dumps(traceback.format_stack()).decode()
+            trace=orjson.dumps(traceback.format_stack()).decode(),
         )
     else:
         error_response_data = get_response(
             message="Internal server error",
             details=exc.__class__.__name__ + ": " + str(exc),
             status_code=500,
-            trace=traceback.format_exc()
+            trace=traceback.format_exc(),
         )
-        error_response = JsonResponse(error_response_data, status=error_response_data["status_code"])
+        error_response = JsonResponse(
+            error_response_data, status=error_response_data["status_code"]
+        )
 
     return error_response
 
