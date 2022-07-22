@@ -7,3 +7,4 @@
 picture/*
 media/*
 dump.rdb
+*.env
