@@ -6,7 +6,7 @@ from db_api.models import UserORM
 class UserRecords:
 
     @staticmethod
-    def get_by_username(username:str) -> Union[UserORM, bool]:
+    def get_by_username(username:str) -> Optional[UserORM]:
         try:
             user_orm = UserORM.objects.get(username=username)
             return user_orm
