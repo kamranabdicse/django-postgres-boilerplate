@@ -17,14 +17,14 @@ class UserORM(AbstractUser):
     modified = models.DateTimeField(auto_now=True)
 
     def _generate_jwt_token(self):
-        token_lifetime = datetime.datetime.now() + datetime.timedelta(hours=1)
+        token_lifetime = datetime.datetime.now() + datetime.timedelta(hours=3)
 
         token = jwt.encode(
             {
                 "jti": uuid.uuid4().hex[:15].lower(),
                 "user_id": self.pk,
                 "username": self.username,
-                "exp": int(token_lifetime.strftime("%s")),
+                "exp": int(datetime.datetime.timestamp(token_lifetime)),
             },
             settings.JWT.get("SIGNING_KEY"),
             algorithm="HS256",
@@ -54,7 +54,6 @@ class OrderORM(SafeTemplate):
     )
     choose_time = models.DateTimeField(null=True)
     purchased_time = models.DateTimeField(null=True)
-
 
 
 class BlacklistedToken(models.Model):

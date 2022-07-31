@@ -1,8 +1,13 @@
 from rest_framework import serializers, exceptions
-from django.contrib.auth import authenticate, get_user_model
+from django.contrib.auth import authenticate
+from django.contrib.auth.hashers import make_password
 
-from db_api.lib.validate_phone_number import validate_phone_number
 from db_api.queries import UserRecords
+from django.contrib.auth.password_validation import validate_password
+from django.db import transaction
+
+from db_api.models import UserORM
+from project_name.lib.logger import logger
 
 
 class PasswordField(serializers.CharField):
@@ -40,3 +45,38 @@ class LoginSerializer(serializers.Serializer):
         access = user._generate_jwt_token()
         response["access"] = access
         return response
+
+
+class RegisterSerilizer(serializers.Serializer):
+    username = serializers.EmailField(
+        required=True,
+        # validators=[UniqueValidator(queryset=User.objects.all())],
+        write_only=True,
+    )
+    password = serializers.CharField(
+        write_only=True,
+        required=True,
+        validators=[
+            validate_password
+        ],  # TODO in order to error handeling its better to handle it on handle method
+    )
+
+    def validate(self, attrs):
+        username = attrs.get("username")
+        if UserORM.objects.filter(username=username).exists():
+            raise exceptions.ValidationError("This username is exists already")
+        return attrs
+
+    def create(self, validated_data):
+        try:
+            with transaction.atomic():
+                user_data = {
+                    "username": validated_data.get("username"),
+                    "password": make_password(validated_data.get("password")),
+                }
+                user_orm = UserORM.objects.create(**user_data)
+                return user_orm
+
+        except Exception as err:
+            logger.error("in user registration something went wrong!")
+            raise err
