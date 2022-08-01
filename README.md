@@ -6,11 +6,6 @@ and install required python packages specified in 'requirements.txt'. You can fi
 
 **Warning:** Remember to place values that have white space inside them between **""**
 
-For preventing git merge conflicts in **.env** file after updating it; run following command:
-
-```shell
-git update-index --assume-unchanged .env
-```
 ## Datbase Migrations:
 - First of all you must run makemigrations and migrate
 ```
