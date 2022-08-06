@@ -42,7 +42,8 @@ class LoginSerializer(serializers.Serializer):
         response = super().to_representation(instance)
         username = response.pop("username")
         user = UserRecords.get_by_username(username=username)
-        access = user._generate_jwt_token()
+        print("-----------user---------", user)
+        access = user.token
         response["access"] = access
         return response
 
@@ -63,7 +64,7 @@ class RegisterSerilizer(serializers.Serializer):
 
     def validate(self, attrs):
         username = attrs.get("username")
-        if UserORM.objects.filter(username=username).exists():
+        if UserRecords.get_by_username(username=username):
             raise exceptions.ValidationError("This username is exists already")
         return attrs
 
@@ -72,9 +73,9 @@ class RegisterSerilizer(serializers.Serializer):
             with transaction.atomic():
                 user_data = {
                     "username": validated_data.get("username"),
-                    "password": make_password(validated_data.get("password")),
+                    "password": validated_data.get("password"),
                 }
-                user_orm = UserORM.objects.create(**user_data)
+                user_orm = UserRecords.create(**user_data)
                 return user_orm
 
         except Exception as err:
