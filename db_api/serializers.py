@@ -1,8 +1,13 @@
 from rest_framework import serializers, exceptions
-from django.contrib.auth import authenticate, get_user_model
+from django.contrib.auth import authenticate
+from django.contrib.auth.hashers import make_password
 
-from db_api.lib.validate_phone_number import validate_phone_number
 from db_api.queries import UserRecords
+from django.db import transaction, IntegrityError
+
+from db_api.models import UserORM
+from project_name.lib.logger import logger
+from lib.validate_password import validate_password
 
 
 class PasswordField(serializers.CharField):
@@ -37,6 +42,38 @@ class LoginSerializer(serializers.Serializer):
         response = super().to_representation(instance)
         username = response.pop("username")
         user = UserRecords.get_by_username(username=username)
-        access = user._generate_jwt_token()
+        access = user.get_token()
         response["access"] = access
         return response
+
+
+class RegisterSerilizer(serializers.Serializer):
+    username = serializers.CharField(
+        required=True,
+        write_only=True,
+    )
+    password = serializers.CharField(
+        write_only=True,
+        required=True,
+    )
+
+    def validate(self, attrs):
+        username = attrs.get("username")
+        if UserRecords.get_by_username(username=username):
+            raise exceptions.ValidationError("This username is exists already")
+        if not validate_password(attrs.get("password")):
+            raise exceptions.ValidationError("Password is not valid")
+        return attrs
+
+    def create(self, validated_data):
+        try:
+            with transaction.atomic():
+                user_data = {
+                    "username": validated_data.get("username"),
+                    "password": validated_data.get("password"),
+                }
+                user_orm = UserRecords.create(**user_data)
+                return user_orm
+
+        except IntegrityError as err:
+            logger.error(f"in user registration this {err} went wrong!")
