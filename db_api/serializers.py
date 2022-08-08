@@ -3,11 +3,11 @@ from django.contrib.auth import authenticate
 from django.contrib.auth.hashers import make_password
 
 from db_api.queries import UserRecords
-from django.contrib.auth.password_validation import validate_password
 from django.db import transaction
 
 from db_api.models import UserORM
 from project_name.lib.logger import logger
+from lib.validate_password import validate_password
 
 
 class PasswordField(serializers.CharField):
@@ -42,30 +42,27 @@ class LoginSerializer(serializers.Serializer):
         response = super().to_representation(instance)
         username = response.pop("username")
         user = UserRecords.get_by_username(username=username)
-        print("-----------user---------", user)
-        access = user.token
+        access = user.get_token()
         response["access"] = access
         return response
 
 
 class RegisterSerilizer(serializers.Serializer):
-    username = serializers.EmailField(
+    username = serializers.CharField(
         required=True,
-        # validators=[UniqueValidator(queryset=User.objects.all())],
         write_only=True,
     )
     password = serializers.CharField(
         write_only=True,
         required=True,
-        validators=[
-            validate_password
-        ],  # TODO in order to error handeling its better to handle it on handle method
     )
 
     def validate(self, attrs):
         username = attrs.get("username")
         if UserRecords.get_by_username(username=username):
             raise exceptions.ValidationError("This username is exists already")
+        if not validate_password(attrs.get("password")):
+            raise exceptions.ValidationError("Password is not valid")
         return attrs
 
     def create(self, validated_data):
