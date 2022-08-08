@@ -47,7 +47,7 @@ class LoginSerializer(serializers.Serializer):
         return response
 
 
-class RegisterSerilizer(serializers.Serializer[]):
+class RegisterSerilizer(serializers.Serializer):
     username = serializers.CharField(
         required=True,
         write_only=True,
@@ -59,7 +59,6 @@ class RegisterSerilizer(serializers.Serializer[]):
 
     def validate(self, attrs):
         username = attrs.get("username")
-        print("-------------validate in serilizer")
         if UserRecords.get_by_username(username=username):
             raise exceptions.ValidationError("This username is exists already")
         if not validate_password(attrs.get("password")):
@@ -67,8 +66,6 @@ class RegisterSerilizer(serializers.Serializer[]):
         return attrs
 
     def create(self, validated_data):
-        print("-------------validate in serilizer")
-
         try:
             with transaction.atomic():
                 user_data = {
