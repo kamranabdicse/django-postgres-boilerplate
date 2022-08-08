@@ -3,7 +3,7 @@ from django.contrib.auth import authenticate
 from django.contrib.auth.hashers import make_password
 
 from db_api.queries import UserRecords
-from django.db import transaction
+from django.db import transaction, IntegrityError
 
 from db_api.models import UserORM
 from project_name.lib.logger import logger
@@ -75,6 +75,5 @@ class RegisterSerilizer(serializers.Serializer):
                 user_orm = UserRecords.create(**user_data)
                 return user_orm
 
-        except Exception as err:
-            logger.error("in user registration something went wrong!")
-            raise err
+        except IntegrityError as err:
+            logger.error(f"in user registration this {err} went wrong!")

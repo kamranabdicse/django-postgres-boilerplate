@@ -1,11 +1,7 @@
+from lib.exceptions.exception import InvalidEmail
 from lib.generate_jwt_token import generate_jwt_token
 from lib.validate_email import validate_email
 
-
-class InvalidEmail(Exception):
-    def __init__(self, message, errors):            
-        super().__init__(message)        
-        self.errors = errors
 
 class User:
     """
@@ -13,7 +9,7 @@ class User:
     """
     def __init__(self, username):
         if not validate_email(username):
-            raise InvalidEmail
+            raise InvalidEmail()
         self.username = username
         
     def get_token(self):    

@@ -1,6 +1,6 @@
 import logging
 import random
-
+from rest_framework.exceptions import NotFound, ValidationError, APIException
 from django.http import JsonResponse, Http404
 from rest_framework.schemas.openapi import AutoSchema
 from rest_framework import generics
@@ -13,9 +13,19 @@ from http import HTTPStatus
 
 from db_api.serializers import LoginSerializer
 from db_api.serializers import RegisterSerilizer
+from lib.exceptions.exception import InvalidEmail
 
 
 logger = logging.getLogger(__name__)
+
+
+def wrap_exceptions(func):
+    def func_(*args, **kwargs):
+        try:
+            return func(*args, **kwargs)
+        except InvalidEmail:
+            raise ValidationError("Field username must be valid email")
+    return func_
 
 
 class LoginView(generics.GenericAPIView):
@@ -27,6 +37,7 @@ class LoginView(generics.GenericAPIView):
     permission_classes = (AllowAny,)
     serializer_class = LoginSerializer
 
+    @wrap_exceptions
     def post(self, request):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -38,6 +49,7 @@ class RegisterView(generics.GenericAPIView):
     permission_classes = (AllowAny,)
     serializer_class = RegisterSerilizer
 
+    @wrap_exceptions
     def post(self, request, *args, **kwargs):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
