@@ -9,3 +9,4 @@ media/*
 dump.rdb
 *.env
 locale/fa_IR/LC_MESSAGES/django.mo
+venv

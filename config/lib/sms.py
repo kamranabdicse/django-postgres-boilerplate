@@ -5,7 +5,7 @@ from rest_framework import status
 from rest_framework.exceptions import APIException
 from decouple import config
 
-from project_name.lib.logger import logger
+from config.lib.logger import logger
 
 
 class SMS:

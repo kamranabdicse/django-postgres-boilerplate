@@ -32,7 +32,6 @@ class LoginView(generics.GenericAPIView):
     """
     Login
     """
-
     schema = AutoSchema(tags=["user"], operation_id_base="login")
     permission_classes = (AllowAny,)
     serializer_class = LoginSerializer

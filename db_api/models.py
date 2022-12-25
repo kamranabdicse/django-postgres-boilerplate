@@ -7,7 +7,7 @@ from django.contrib.auth.models import AbstractUser
 
 from django.conf import settings
 
-from project_name.lib.base_model import SafeTemplate
+from config.lib.base_model import SafeTemplate
 
 
 class UserORM(AbstractUser):

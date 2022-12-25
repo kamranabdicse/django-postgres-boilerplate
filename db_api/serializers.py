@@ -6,7 +6,7 @@ from db_api.queries import UserRecords
 from django.db import transaction, IntegrityError
 
 from db_api.models import UserORM
-from project_name.lib.logger import logger
+from config.lib.logger import logger
 from lib.validate_password import validate_password
 
 

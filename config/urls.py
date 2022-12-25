@@ -3,8 +3,8 @@ from django.urls import path, include
 from rest_framework.schemas import get_schema_view
 from django.views.generic import TemplateView
 
-from project_name.lib.openapi import CustomSchemaGenerator
-from project_name.router import url_patterns as router
+from config.lib.openapi import CustomSchemaGenerator
+from config.router import url_patterns as router
 
 urlpatterns = [
     path('admin/', admin.site.urls),

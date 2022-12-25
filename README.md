@@ -1,4 +1,4 @@
-# Order Book
+# Django Rest Framework boilerplate
 The MVP of our Order book in library platform.
 
 To run this app for local development you have to provide right values for environment variables specified in '.env'
@@ -33,5 +33,5 @@ python3 manage.py compilemessages -l fa_IR
 ```
 - For using celery you must install redis or rabbitmq then use
 ```
-celery -A base_project worker -l info
+celery -A config worker -l info
 ```

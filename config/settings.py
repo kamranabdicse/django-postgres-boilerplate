@@ -43,17 +43,17 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     # our middleware
     "django.middleware.locale.LocaleMiddleware",
-    "project_name.lib.exception_handler.ExceptionMiddleware",
+    "config.lib.exception_handler.ExceptionMiddleware",
 ]
 
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
         "db_api.lib.authentication.CustomAuthentication",
     ],
-    "EXCEPTION_HANDLER": "project_name.lib.exception_handler.handle_exception",
+    "EXCEPTION_HANDLER": "config.lib.exception_handler.handle_exception",
 }
 
-ROOT_URLCONF = "project_name.urls"
+ROOT_URLCONF = "config.urls"
 
 TEMPLATES = [
     {
@@ -71,7 +71,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = "project_name.wsgi.application"
+WSGI_APPLICATION = "config.wsgi.application"
 
 DATABASES = json.loads(config("DATABASE"))
 
