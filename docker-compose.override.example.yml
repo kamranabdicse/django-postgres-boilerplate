@@ -1,0 +1,78 @@
+version: "3.7"
+services:
+  backend:
+    image: backend
+    ports:
+      - "5007:8020"
+    networks:
+      - br-backend
+    
+  celery:
+    image: backend
+    networks:
+      - br-backend
+  
+  pgadmin:
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ***@gmail.com
+      PGADMIN_DEFAULT_PASSWORD: ****
+    ports:
+      - "5052:80"
+    networks:
+      - br-backend
+  
+  redis:
+    networks:
+      - br-backend
+
+  rabbitmq:
+    networks:
+      - br-backend
+
+volumes:
+  backend-redis-data:
+    driver: local
+    driver_opts:
+      device: /home/kamran/project/
+      o: bind
+      type: volume
+
+  backend-pgadmin:
+    driver: local
+    driver_opts:
+      device: /home/kamran/project/
+      o: bind
+      type: volume
+  
+  backend-rabbitmq-data:
+    driver: local
+    driver_opts:
+      device: /home/kamran/project/
+      o: bind
+      type: volume
+
+  backend-rabbitmq-log:
+    driver: local
+    driver_opts:
+      device: /home/kamran/project/
+      o: bind
+      type: volume
+
+  backend-migration:
+    driver: local
+    driver_opts:
+      device: /home/kamran/project/
+      o: bind
+      type: volume
+
+
+  backend-media:
+    driver: local
+    driver_opts:
+      device: /backend/media
+      o: bind
+      type: volume
+
+networks:
+  br-backend:
+    external: true

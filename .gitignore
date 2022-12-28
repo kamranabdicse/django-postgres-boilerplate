@@ -5,8 +5,9 @@
 /**/__pycache__/
 *.pyc
 picture/*
-media/*
+backend/media/*
 dump.rdb
 *.env
-locale/fa_IR/LC_MESSAGES/django.mo
-venv
+backend/locale/fa_IR/LC_MESSAGES/django.mo
+.coverage
+venv/

@@ -1,0 +1,47 @@
+version: "3.7"
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        - proxy
+    restart: always
+    environment:
+      - TZ=Asia/Tehran
+    volumes:
+      - backend-migration:/opt/app/backend/db_api/migrations/
+      - backend-media:/opt/app/backend/media/
+    command: sh -c "/opt/app/start-server.sh"
+
+  redis:
+    image: redis:latest
+    volumes:
+      - backend-redis-data:/data
+
+  rabbitmq:
+    image: rabbitmq
+    volumes:
+      - backend-rabbitmq-data:/var/lib/rabbitmq/
+      - backend-rabbitmq-log:/var/log/rabbitmq
+
+  celery:
+    command: sh -c "cd backend && celery -A config worker -l info"
+    depends_on:
+      - redis
+      - backend
+
+  pgadmin:
+    image: dpage/pgadmin4
+    volumes:
+      - backend-pgadmin:/var/lib/pgadmin
+    restart: unless-stopped
+
+
+volumes:
+  backend-redis-data:
+  backend-pgadmin:
+  backend-rabbitmq-data:
+  backend-rabbitmq-log:
+  backend-migration:
+  backend-media:

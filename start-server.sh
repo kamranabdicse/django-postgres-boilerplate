@@ -1,0 +1,2 @@
+#!/usr/bin/env bash
+(cd /opt/app/backend; PYTHONUNBUFFERED=TRUE gunicorn copy_trading.wsgi:application --enable-stdio-inheritance --user www-data --bind 0.0.0.0:8010 --workers 8 --timeout 240) & nginx -g "daemon off;"

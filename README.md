@@ -1,4 +1,4 @@
-# Django Rest Framework boilerplate
+# Django Rest Framework Boilerplate
 The MVP of our Order book in library platform.
 
 To run this app for local development you have to provide right values for environment variables specified in '.env'
