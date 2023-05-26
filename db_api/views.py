@@ -13,45 +13,41 @@ from http import HTTPStatus
 
 from db_api.serializers import LoginSerializer
 from db_api.serializers import RegisterSerilizer
-from lib.exceptions.exception import InvalidEmail
+from db_api.exceptions import InvalidEmail , UserNotFound
 
+from ninja import Router, Query
+from db_api.services import (
+    login_user,
+    register_user
+) 
+from db_api.schema import (
+    AuthenticationIn,
+    AuthenticationOut,
+    UserSchema,
+)
 
+router = Router()
 logger = logging.getLogger(__name__)
 
 
-def wrap_exceptions(func):
-    def func_(*args, **kwargs):
-        try:
-            return func(*args, **kwargs)
-        except InvalidEmail:
-            raise ValidationError("Field username must be valid email")
-    return func_
+@router.post(
+    "login",
+    response=AuthenticationOut,
+)
+def login(request, payload: AuthenticationIn):
+    access = login_user(username=payload.username, password=payload.password)
+    if not access:
+        raise UserNotFound("user not found")
+    return {"access": access}
 
 
-class LoginView(generics.GenericAPIView):
-    """
-    Login
-    """
+@router.post(
+    "register",
+    response=UserSchema,
+)
+def register(request, payload: AuthenticationIn):
+    user = register_user(username=payload.username, password=payload.password)
+    if not user:
+        raise UserNotFound("user not found")
+    return user
 
-    schema = AutoSchema(tags=["user"], operation_id_base="login")
-    permission_classes = (AllowAny,)
-    serializer_class = LoginSerializer
-
-    @wrap_exceptions
-    def post(self, request):
-        serializer = self.serializer_class(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        return JsonResponse(serializer.data, safe=False)
-
-
-class RegisterView(generics.GenericAPIView):
-    schema = AutoSchema(tags=["user"], operation_id_base="register")
-    permission_classes = (AllowAny,)
-    serializer_class = RegisterSerilizer
-
-    @wrap_exceptions
-    def post(self, request, *args, **kwargs):
-        serializer = self.serializer_class(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return Response(serializer.data, status=HTTPStatus.CREATED)
