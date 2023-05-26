@@ -12,7 +12,7 @@ from project_name.lib.base_model import SafeTemplate
 
 class UserORM(AbstractUser):
     can_use_basic_token = models.BooleanField(default=False)
-    cell_number = models.CharField(max_length=20, blank=True, null=True, unique=True)
+    # cell_number = models.CharField(max_length=20, blank=True, null=True, unique=True)
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
 

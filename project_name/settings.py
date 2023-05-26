@@ -2,9 +2,8 @@ import json
 import os
 from pathlib import Path
 from django.utils.translation import gettext_lazy as _
-
 from decouple import config
-
+from ninja import NinjaAPI
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -43,14 +42,12 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     # our middleware
     "django.middleware.locale.LocaleMiddleware",
-    "project_name.lib.exception_handler.ExceptionMiddleware",
 ]
 
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
         "db_api.lib.authentication.CustomAuthentication",
     ],
-    "EXCEPTION_HANDLER": "project_name.lib.exception_handler.handle_exception",
 }
 
 ROOT_URLCONF = "project_name.urls"
@@ -158,3 +155,12 @@ CORS_ALLOW_HEADERS = json.loads(config("CORS_ALLOW_HEADERS"))
 CORS_ALLOW_CREDENTIALS = config("CORS_ALLOW_CREDENTIALS", default=True, cast=bool)
 CSRF_TRUSTED_ORIGINS = json.loads(config("CSRF_TRUSTED_ORIGINS"))
 CORS_ALLOW_METHODS = json.loads(config("CORS_ALLOW_METHODS"))
+
+import django
+from django.utils.encoding import force_str
+django.utils.encoding.force_text = force_str
+
+
+from django.utils.translation import gettext, gettext_lazy
+django.utils.translation.ugettext = gettext
+django.utils.translation.ugettext_lazy = gettext_lazy
