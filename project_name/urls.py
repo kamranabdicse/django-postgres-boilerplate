@@ -13,22 +13,5 @@ app_api.add_router("v1/user/", user_router, tags=["users"])
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    # path(
-    #     "api/openapi/",
-    #     get_schema_view(
-    #         title="API Services",
-    #         description="API developers hoping to use our service",
-    #         generator_class=CustomSchemaGenerator,
-    #         public=True,
-    #     ),
-    #     name="openapi-schema",
-    # ),
-    # path(
-    #     "api/docs/",
-    #     TemplateView.as_view(
-    #         template_name="swagg.html", extra_context={"schema_url": "openapi-schema"}
-    #     ),
-    #     name="docs",
-    # ),
     path("api/", app_api.urls),
 ]
