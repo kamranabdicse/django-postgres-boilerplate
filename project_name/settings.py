@@ -1,9 +1,12 @@
 import json
 import os
 from pathlib import Path
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext_lazy, gettext
+import django
+from django.utils.encoding import force_str
 from decouple import config
 from ninja import NinjaAPI
+import datetime
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -28,6 +31,8 @@ INSTALLED_APPS = [
     "rest_framework",
     "corsheaders",
     "db_api.apps.DbApiConfig",
+    # third party libraries,
+    "ninja_extra",
 ]
 
 MIDDLEWARE = [
@@ -98,8 +103,6 @@ USE_L10N = True
 
 USE_TZ = True
 
-LANGUAGES = [("en", _("English")), ("fa", _("Persian"))]
-
 LOCALE_PATHS = (BASE_DIR.joinpath("locale/"),)
 
 STATIC_URL = "/static/"
@@ -156,11 +159,21 @@ CORS_ALLOW_CREDENTIALS = config("CORS_ALLOW_CREDENTIALS", default=True, cast=boo
 CSRF_TRUSTED_ORIGINS = json.loads(config("CSRF_TRUSTED_ORIGINS"))
 CORS_ALLOW_METHODS = json.loads(config("CORS_ALLOW_METHODS"))
 
-import django
-from django.utils.encoding import force_str
+
 django.utils.encoding.force_text = force_str
-
-
-from django.utils.translation import gettext, gettext_lazy
 django.utils.translation.ugettext = gettext
 django.utils.translation.ugettext_lazy = gettext_lazy
+
+SWAGGER_SETTINGS = {
+    "USE_SESSION_AUTH": False,
+    "api_version": "0.1",
+    "SECURITY_DEFINITIONS": {
+        "api_key": {"type": "apiKey", "name": "Authorization", "in": "header"},
+    },
+}
+
+NINJA_JWT = {
+    "AUTH_TOKEN_CLASSES": ("ninja_jwt.tokens.SlidingToken",),
+    "SLIDING_TOKEN_LIFETIME": datetime.timedelta(hours=5),
+    "SLIDING_TOKEN_REFRESH_LIFETIME": datetime.timedelta(days=1),
+}

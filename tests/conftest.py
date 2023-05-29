@@ -21,4 +21,3 @@ def user():
     username = "test_user"
     user = UserFactory(username=username)
     return user
-

@@ -1,4 +1,4 @@
-from project_name.lib.openapi_v2 import app_api
+from project_name.api import api as app_api
 from django.core.exceptions import BadRequest
 from django.utils.encoding import force_text
 

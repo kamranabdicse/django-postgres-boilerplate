@@ -1,3 +1,3 @@
-from ninja import NinjaAPI
+# from ninja import NinjaAPI
 
-app_api = NinjaAPI(title="Library Management")
+# app_api = NinjaAPI(title="Library Management")
